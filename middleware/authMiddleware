@@ -1,0 +1,55 @@
+
+const jwt = require (' jsonwebtoken');
+const User = require (' ../models/User');
+
+//this file handles authentication or user-related actions (like login, signup, token verification).
+
+//JWT is tied to user identity.
+
+//To generate a token or check credentials, only need the User model
+
+
+const authMiddleware = async (req , res ) =>{
+ 
+
+      // this authheader looks for - Authorization: Bearer <token>
+
+    const authHeader = req.headers.authorization;
+
+    //checks for - header exists and is a Bearer token
+
+    if(!authHeader || authHeader.startsWith('Bearer')) {
+        return res.status(401).jason ({message: ' No token provided'});
+    }
+      // if token exists: split the header by using space abd take the second part(jwt)
+
+      const token = authHeader.split(' ')[1];
+
+
+    try{
+
+        // the middleware will verify the token, esply for the secret,)
+
+        const payload = jwt.verify(token,process.env.JWT_SECRET);
+
+        // after verification attach jwt with user req. and ensure password not 
+        //included in the returned object
+
+        req.user = await User.findById(payload.id).select('-password');
+
+        //check for the user exists or not
+
+        if(!req.user){
+            return res.status(401).json({ message : 'User not found'});
+        }
+
+        // if the user exists , procedd to route
+
+        next();
+
+    } catch (error) {
+        res.status(401).json ({message :'Invalid token'});
+    }
+};
+
+module.exports = authMiddleware;

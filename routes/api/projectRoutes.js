@@ -6,19 +6,19 @@ const{ createProject,
     updateProject,
     deleteProject,} = require('../../controllers/projectController');
 
-    const auth = require ('../middleware/authMiddleware');
+    const authMiddleware = require ('../middleware/authMiddleware');
 
 //register a new user
 
-router.post('/', auth, createProject);
+router.post('/', authMiddleware, createProject);
 
-router.get('/', auth, getProjects);
+router.get('/', authMiddleware, getProjects);
 
-router.get ('/:id',auth,  getProjectByID );
+router.get ('/:id',authMiddleware,  getProjectByID );
 
-router.put('/:id', auth, updateProject)
+router.put('/:id', authMiddleware, updateProject)
 
-router.delete('/:id', auth, deleteProject);
+router.delete('/:id', authMiddleware, deleteProject);
 
 
 
