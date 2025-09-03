@@ -1,0 +1,107 @@
+
+
+const Project = require('../models/Project')
+
+//create a project
+
+ const createProject  = async( req , res) =>{
+
+    try{
+    const project = new Project({
+        ...req.body,
+        owner: req.user.id // form middleware
+
+    });
+
+    await project.save();
+    res.status(201).json  (project);
+    
+ }catch(error){
+    res.status(400).json({message: 'error.message'})
+
+ }
+};
+
+//get the project
+ const getProjects = async (req, res) =>{
+    try{
+        const projects = await Project.find({owner:req.user.id})
+        res.json(projects);
+    }catch(error){
+        res.status(500).json ({message: error.message});
+    }
+ };
+
+ 
+// get single project by id
+
+
+ const getProjectByID= async (req, res) =>{
+
+    try{
+        const project = await Project.findById(req.params.id);
+        if(!project) return res.status(404).json ({message: 'Project not found'});
+
+
+        if(project.owner.toString() !== req.user.id)
+            return res.status(403).json({message: "Not an authorized user"});
+
+    
+    res.json(project);
+
+ }catch(error){
+    res.status(500).json({ message : error.message});
+ }
+
+ };
+
+ //update project
+
+ const updateProject= async(req, res) =>{
+    try{
+        const project = await Project.findById(req.params.id);
+        if(!project) return res.status(404).json({message: 'Project not found'})
+
+            //check for the authorization
+
+               if(project.owner.toString() !== req.user.id)
+            return res.status(403).json({message: "Not an authorized user"});
+
+               // update the project
+
+               Object.assign (project, req.body);
+        
+               await project.save();
+               res.json(project);
+    }catch(error) {
+        res.status(400).json({message:error.message});
+    }
+ };
+
+ //delete project
+
+ const deleteProject = async(req, res) =>{
+    try{
+        const project = await Project.findById(req.params.id);
+      if(!project) return res.status(404).json({message: 'Project not found'});
+
+       //check for the authorization
+
+               if(project.owner.toString() !== req.user.id)
+            return res.status(403).json({message: "Not an authorized user"});
+    
+    await project.remove();
+    res.json({message: 'Project removed'});
+}catch(error){
+    res.status(500).json ({message :error.message});
+}
+ 
+ };
+
+ module.exports = {
+    createProject,
+    getProjects,
+    getProjectByID,
+    updateProject,
+    deleteProject,
+ };

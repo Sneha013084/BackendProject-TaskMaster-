@@ -1,0 +1,188 @@
+
+const Task = require ('../models/Task')
+const Project =require ('../models/Project')
+
+//Task routes are nested under the project
+
+//create task  including ownership
+
+const createTask = async(req ,res) =>{
+
+    // to pull the project id from the URL path(controller logic)
+    try{
+        const { projectId } = req.params;
+
+        //Grab title, description, status from the request body
+        const{ title, description, status } =  req.body;
+
+   /////////////////////////////////////////////////////////
+        //Before creating the task, you must verify that the ,
+        // logged-in user owns the project specified by :projectId.
+           //1. check if the project exists??
+
+
+          const project = await Project.findById(projectId);
+
+          if(!project){
+            res.status(400).json({message : "Project not found"});
+          }
+
+          //2. ownership: heck the id of the user with the request id,
+            //if not 403 = not authorized
+
+             if(project.user.toString() !==req.user._id){
+              res.status(403).json ({message: "Not authorized"})
+          }
+        
+           //////////////////////////////////////////////////////////
+
+        const task = new Task({
+            title,
+            description,
+            status,
+            project:projectId,
+        })
+        // now task is created
+
+        await task.save();
+        res.status(201).json(task);
+    } catch (error){
+        res.status(500).json ({message: 'Server error'});
+    }
+};
+
+
+// @get all the tasks belongs to the specific project id
+
+const getTasksByProject =async(req, res) =>{
+    try{
+        
+        const { projectId } = req.params;
+
+        // 1/ check for parent project
+
+        const project = await Project.findById(projectId);
+
+        if(!project) {
+            return res.status(404).json({ message : "Project not found"});
+        }
+
+         //2.ownership check:
+
+         if(project.user.toString() !== req.user.id){
+            return res.status(403).json ({ message: " Not authorized"});
+         }
+
+   //  fetch all the tasks belongs to this project
+
+         const tasks = await Task.find({project: projectId});
+
+         res.json(tasks);
+        } catch(error){
+            console.error("Error fetching tasks: " , error);
+            res.status(500).json({message: "Server error"})
+
+        }
+
+    };
+
+    // update a task by using task id
+ 
+    const updateTask = async (req , res) =>{
+        try{
+            const {taskId} = req.params;
+             const updates = req.body;
+
+
+             // find the task by using taskId
+
+             const task = await Task.findById (taskId);
+                if(!task) {
+                    return res.status(404).json({message: " Task not found"});
+                }
+             //     by using task.project(which gives project id) find out project
+
+             const project = await Project.findById( task.project);
+
+             if(!project){
+                return res.status(404).json({message:" Parent project not found"});
+             }
+
+             // then ownership check
+
+             if(project.user.toString() !== req.user.id){
+                return res.status(403).json({message: "Not authorized"});
+             }
+
+             /// Update task fields:ny field in updates overwrites the corresponding field in task.
+             // copies all the properties from source(request ) to target
+
+             Object.assign(task, req.body);
+             await task.save();
+
+             // return the task
+
+             res.json(task);
+            
+            } catch(error){
+         console.error("Error in updating this task:", error);
+          res.status(500).json({message: " Server error"});
+
+        }
+    };
+
+
+// delete a task by using task id
+
+       const deleteTask = async(req, res) =>{
+    try{
+
+        const { taskId } = req.params;
+
+
+        // 1.find the task by taskid
+
+        const task = await Task.findById(taskid);
+
+      if(!task) {
+        return res.status(404).json({message: 'Task is not found'});
+    }
+
+
+    // 2. find the parent project by using task
+
+    const project = await Project.findById(task.project)
+
+    if(!project){
+        return res.status(404).json({message : " Project not found"})
+    }
+
+
+
+       //check for the authorization
+
+               if(project.user.toString() !== req.user.id){
+            return res.status(403).json({message: "Not authorized to delete this task"});
+    }
+
+
+      // delete the task
+
+    await task.remove();
+
+    
+    res.json({message: 'Task deleted successfully'});
+}catch(error){
+
+    console.error("Error deleting task: ", error)
+    res.status(500).json ({message :error.message});
+}
+ 
+ };
+
+ module.exports = {
+    createTask,
+    getTasksByProject,
+    updateTask,
+    deleteTask,
+ };
