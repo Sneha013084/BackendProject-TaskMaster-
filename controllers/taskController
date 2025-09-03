@@ -30,7 +30,7 @@ const createTask = async(req ,res) =>{
           //2. ownership: heck the id of the user with the request id,
             //if not 403 = not authorized
 
-             if(project.user.toString() !==req.user._id){
+             if(project.user.toString() !==req.user.id){
               res.status(403).json ({message: "Not authorized"})
           }
         
@@ -142,7 +142,7 @@ const getTasksByProject =async(req, res) =>{
 
         // 1.find the task by taskid
 
-        const task = await Task.findById(taskid);
+        const task = await Task.findById(taskId);
 
       if(!task) {
         return res.status(404).json({message: 'Task is not found'});
