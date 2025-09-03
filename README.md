@@ -72,8 +72,23 @@ Postman or Insomnia for testing
             
             Only authorized users can access their tasks
 
+Authentication : Users log in or register to verify their identity.
 
-     
+                Passwords are hashed using bcrypt for security.
+
+                JWT tokens are issued on login/registration and must be sent with requests to protected routes.
+                
+Authorization:
+
+                  Users can only access their own projects and tasks.
+                  
+                  Middleware checks if req.user.id matches the resource owner.
+                  
+                  Requests without permission return 403 Forbidden.
+                  
+                  Requests without a token return 401 Unauthorized.
+                  
+                   
 
 
 
