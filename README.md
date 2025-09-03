@@ -86,7 +86,8 @@ Authorization:
                   
                   Requests without permission return 403 Forbidden.
                   
-                  Requests without a token return 401 Unauthorized.
+                  Requests without a token return 401 Unauthorized.  
+                  
                   
                    
 
