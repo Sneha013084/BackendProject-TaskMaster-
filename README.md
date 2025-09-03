@@ -64,20 +64,22 @@ Postman or Insomnia for testing
 
 ## Project & Task Management
 
-            Users can create projects
-            
-            Tasks are tied to projects
-            
-            Only project owner can update/delete project
-            
-            Only authorized users can access their tasks
+              Users can create projects
+              
+              Tasks are tied to projects
+              
+              Only project owner can update/delete project
+              
+              Only authorized users can access their tasks
 
-Authentication : Users log in or register to verify their identity.
+Authentication : 
 
-                Passwords are hashed using bcrypt for security.
-
-                JWT tokens are issued on login/registration and must be sent with requests to protected routes.
-                
+              Users log in or register to verify their identity.
+  
+              Passwords are hashed using bcrypt for security.
+  
+              JWT tokens are issued on login/registration and must be sent with requests to protected routes.
+                  
 Authorization:
 
                   Users can only access their own projects and tasks.
