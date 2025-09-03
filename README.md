@@ -34,4 +34,48 @@ Postman or Insomnia for testing
               
               DELETE /projects/:id → delete project (owner only)
 
+
+## Task Routes:
+
+              POST /projects/:projectId/tasks → create task
+              
+              GET /projects/:projectId/tasks → get tasks
+              
+              PUT /tasks/:id → update task
+              
+              DELETE /tasks/:id → delete task
+              
+## How it works:
+
+
+## User Registration & Login:
+
+              User sends email/password to /register → password is hashed → user saved → JWT returned
+              
+              Login at /login → password verified → JWT returned
+              
+## Protected Routes
+
+              JWT sent in Authorization header
+              
+              Middleware validates token → sets req.user
+              
+              Routes check ownership (e.g., project owner) before granting access
+
+## Project & Task Management
+
+            Users can create projects
+            
+            Tasks are tied to projects
+            
+            Only project owner can update/delete project
+            
+            Only authorized users can access their tasks
+
+
+     
+
+
+
+
               
